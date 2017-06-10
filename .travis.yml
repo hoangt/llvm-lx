@@ -1,0 +1,25 @@
+language: cpp
+sudo: required
+dist: xenial 
+compiler:
+- g++
+os:
+- linux
+before_script: 
+- g++ --version
+- wget http://releases.llvm.org/4.0.0/clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz
+- tar xf clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz 
+- export PATH=${PWD}/clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04:$PATH
+- cmake -DLLVM_DIR=clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-16.04/lib/cmake .
+script:
+- make VERBOSE=1
+- sudo make install
+branches:
+  only:
+  - master
+addons:
+  apt:
+    packages:
+    - cmake 
+notifications:
+  email: false
