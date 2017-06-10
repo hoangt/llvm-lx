@@ -41,7 +41,11 @@ bool TargetLoopExtractor::runOnModule(Module &M) {
         if(F.isDeclaration()) continue;
 
         auto &LI = getAnalysis<LoopInfoWrapperPass>(F).getLoopInfo();          
-
+        
+        for(auto &L : LI) {
+            auto Loc = L->getStartLoc();
+            errs() << Loc.getLine()
+        }
         
     }
 
