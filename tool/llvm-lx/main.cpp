@@ -58,6 +58,9 @@ cl::OptionCategory LLVMLXOptionCategory("Target Loop Extractor Options",
 cl::list<string> LLVMLXLocations("t", cl::desc("List of loops to extract.\nFormat -t=<file1>:<line1>,<file2>:<line2>"),
                                     cl::Required, cl::cat(LLVMLXOptionCategory));
 
+cl::opt<bool> LLVMLXDumpAllLoopLocations("d", cl::desc("Dump all the filename and line numbers of loops found in the bitcode file"),
+                                            cl::Optional, cl::cat(LLVMLXOptionCategory));
+
 cl::opt<string> inPath(cl::Positional, cl::desc("<Module to analyze>"),
                        cl::value_desc("bitcode filename"), cl::Required,
                        cl::cat(LLVMLXOptionCategory));
@@ -81,9 +84,10 @@ static void instrumentModule(Module &module) {
     pm.add(createTypeBasedAAWrapperPass());
     pm.add(createBreakCriticalEdgesPass());
     pm.add(createLoopSimplifyPass());
+    pm.add(new DominatorTreeWrapperPass());
     pm.add(new LoopInfoWrapperPass());
-    pm.add(createVerifierPass());
     pm.add(new lx::TargetLoopExtractor());
+    pm.add(createVerifierPass());
     pm.run(module);
 
     auto replaceExt = [](string &s, const string &newExt) {

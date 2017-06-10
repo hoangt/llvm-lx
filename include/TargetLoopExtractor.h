@@ -4,10 +4,16 @@
 #include "llvm/ADT/APInt.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Analysis/LoopInfo.h"
+#include "llvm/Analysis/LoopPass.h"
+#include "llvm/IR/Dominators.h"
 #include "llvm/IR/Module.h"
 #include "llvm/Pass.h"
+#include "llvm/Transforms/IPO.h"
+#include "llvm/Transforms/Scalar.h"
 
 #include <set>
+#include <fstream>
+#include <string>
 
 
 namespace lx {
@@ -16,15 +22,23 @@ struct TargetLoopExtractor : public llvm::ModulePass {
     static char ID;
 
     std::set<std::pair<std::string, int>> Locations;
+    std::set<llvm::Function*> ExtractedLoopFunctions; 
+    std::ofstream LoopLocationDumpFile;
 
     TargetLoopExtractor() : llvm::ModulePass(ID) {}
 
-    virtual void getAnalysisUsage(llvm::AnalysisUsage &au) const override {
+    virtual void getAnalysisUsage(llvm::AnalysisUsage &AU) const override {
+        AU.addRequiredID(llvm::BreakCriticalEdgesID);
+        AU.addRequiredID(llvm::LoopSimplifyID);
+        AU.addRequired<llvm::LoopInfoWrapperPass>();
+        AU.addRequired<llvm::DominatorTreeWrapperPass>();
     }
 
-    virtual bool runOnModule(llvm::Module &m) override;
-    bool doInitialization(llvm::Module &m) override;
-    void releaseMemory() override;
+    virtual bool runOnModule(llvm::Module&) override;
+    bool doInitialization(llvm::Module&) override;
+    bool doFinalization(llvm::Module&) override;
+    bool extractLoop(llvm::Loop*, llvm::LoopInfo&, 
+            llvm::DominatorTree&, string);
 
 };
 
