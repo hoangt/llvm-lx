@@ -38,7 +38,7 @@ struct TargetLoopExtractor : public llvm::ModulePass {
     bool doInitialization(llvm::Module&) override;
     bool doFinalization(llvm::Module&) override;
     bool extractLoop(llvm::Loop*, llvm::LoopInfo&, 
-            llvm::DominatorTree&, string);
+            llvm::DominatorTree&, std::string);
 
 };
 
