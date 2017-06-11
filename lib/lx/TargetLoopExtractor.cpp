@@ -18,13 +18,15 @@ using namespace llvm;
 using namespace std;
 using namespace lx;
 
-extern cl::list<string> LLVMLXLocations;
+extern cl::opt<string> LLVMLXLocations;
 extern cl::opt<bool> LLVMLXDumpAllLoopLocations;
 
 bool TargetLoopExtractor::doInitialization(Module &M) { 
-    for(auto Loc : LLVMLXLocations) {
-        if(Loc.find(":") == string::npos || Loc.find(":") != Loc.rfind(":")) {
-            report_fatal_error("[llvm-lx] Specify locations in the form of -t=<file1>:<line1>,<file2>:<line2> ...");
+    SmallVector<StringRef, 4> LocList;
+    StringRef(LLVMLXLocations).split(LocList, ",");
+    for(auto Loc : LocList) {
+        if(Loc.find(":") == StringRef::npos || Loc.find(":") != Loc.rfind(":")) {
+            report_fatal_error("[llvm-lx] Specify locations in the form of -t=<file1>:<line1>[,<file2>:<line2> ...]");
         }
         auto File = Loc.substr(0, Loc.find(":"));
         auto Line = stoi(Loc.substr(Loc.find(":")+1));
@@ -95,6 +97,7 @@ bool TargetLoopExtractor::extractLoop(Loop *L,
         Function *F = Extractor.extractCodeRegion(); 
         if (F) {
             F->setName(std::string("__lx") + Name);
+            stripDebugInfo(*F);
             ExtractedLoopFunctions.insert(F);
             return true;
         }
@@ -104,9 +107,6 @@ bool TargetLoopExtractor::extractLoop(Loop *L,
 }
 
 bool TargetLoopExtractor::runOnModule(Module &M) {
-    for(auto L : Locations) {
-        errs() << L.first << " " << L.second << "\n";
-    }
     
     for(auto &F : M) {
 

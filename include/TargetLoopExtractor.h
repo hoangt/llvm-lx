@@ -3,6 +3,7 @@
 
 #include "llvm/ADT/APInt.h"
 #include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/SetVector.h"
 #include "llvm/Analysis/LoopInfo.h"
 #include "llvm/Analysis/LoopPass.h"
 #include "llvm/IR/Dominators.h"
@@ -22,6 +23,7 @@ struct TargetLoopExtractor : public llvm::ModulePass {
     static char ID;
 
     std::set<std::pair<std::string, int>> Locations;
+
     std::set<llvm::Function*> ExtractedLoopFunctions; 
     std::ofstream LoopLocationDumpFile;
 

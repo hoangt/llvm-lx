@@ -55,8 +55,8 @@ using namespace llvm::sys;
 cl::OptionCategory LLVMLXOptionCategory("Target Loop Extractor Options",
                                          "Additional options for the llvm-lx tool");
 
-cl::list<string> LLVMLXLocations("t", cl::desc("List of loops to extract.\nFormat -t=<file1>:<line1>,<file2>:<line2>"),
-                                    cl::Required, cl::cat(LLVMLXOptionCategory));
+cl::opt<string> LLVMLXLocations("t", cl::desc("List of loops to extract.\nFormat -t=<file1>:<line1>,<file2>:<line2>"),
+                                    cl::OneOrMore, cl::cat(LLVMLXOptionCategory));
 
 cl::opt<bool> LLVMLXDumpAllLoopLocations("d", cl::desc("Dump all the filename and line numbers of loops found in the bitcode file"),
                                             cl::Optional, cl::cat(LLVMLXOptionCategory));

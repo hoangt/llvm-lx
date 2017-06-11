@@ -1,9 +1,13 @@
 #include <stdio.h>
 
-int main(int argc, char *argv[]) {
+void foo(int argc) {
     for(int i = 0; i < argc; i++) {
         printf("chickens");
     }
+}
+
+int main(int argc, char *argv[]) {
+    foo(argc);
     return 0;
 }
 
