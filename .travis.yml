@@ -8,6 +8,7 @@ os:
 before_script: 
 - sudo unlink /usr/bin/gcc && sudo ln -s /usr/bin/gcc-5 /usr/bin/gcc
 - sudo unlink /usr/bin/g++ && sudo ln -s /usr/bin/g++-5 /usr/bin/g++
+- sudo pip install lit
 - g++ --version
 - wget http://releases.llvm.org/4.0.0/clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-14.04.tar.xz
 - tar xf clang+llvm-4.0.0-x86_64-linux-gnu-ubuntu-14.04.tar.xz 
@@ -16,6 +17,7 @@ before_script:
 script:
 - make VERBOSE=1
 - sudo make install
+- lit test
 branches:
   only:
   - master
@@ -27,5 +29,6 @@ addons:
     - gcc-5
     - g++-5
     - cmake 
+    - python-pip
 notifications:
   email: false
