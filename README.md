@@ -14,16 +14,16 @@ LLVM Targeted Loop Extractor
 1. `clang -c -g -emit-llvm test.c`    
 Produces `test.bc` with debug info.
 
-2. `llvm-lx -t=test.c:4 test.bc`
+2. `llvm-lx -t=test.c:4 test.bc`   
 Prints `[llvm-lx] Found loop at test.c:4`   
-Produces `test.lx.bc` which has the loop at line 4 extracted into function called `__lx_test_4`.
+Produces `test.lx.bc` which has the loop at line 4 extracted into function called `__lx_test.c_4`.
 
 ## Notes
 
 1. Extract Multiple - Multiple loops may be extracted by specifying each on the commandline as comma separated locations. Eg. `llvm-lx -t=file1.c:4,file2.c6, file1.c:22`. However, when the loops are in close proximity the code extractor may crash.  
     a. Loop Visit Order - Loops are visited in reverse topological order, innermost to outer loop.   
 
-2. [Whole Program Bitcode](https://github.com/travitch/whole-program-llvm) - Use this project to compile entire workloads to bitcode. Note that this tools requires debug info present in the bitcode.
+2. [Whole Program Bitcode](https://github.com/travitch/whole-program-llvm) - Use this project to compile entire workloads to bitcode. Note that `llvm-lx` requires debug info present in the bitcode.
 
 3. Debugging - In case the loop you expect to find is missing, you can use the `-d` flag while running `llvm-lx` to dump the file name and line number of each loop it encounters into a file called `loop-locs.txt` 
 
