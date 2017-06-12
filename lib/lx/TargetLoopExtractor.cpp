@@ -96,7 +96,8 @@ bool TargetLoopExtractor::extractLoop(Loop *L,
         CodeExtractor Extractor(DT, *L);
         Function *F = Extractor.extractCodeRegion(); 
         if (F) {
-            F->setName(std::string("__lx") + Name);
+            F->setName(Name);
+            F->addFnAttr(Attribute::NoInline);
             stripDebugInfo(*F);
             ExtractedLoopFunctions.insert(F);
             return true;
@@ -104,6 +105,29 @@ bool TargetLoopExtractor::extractLoop(Loop *L,
     }
 
     return false;
+}
+
+static SetVector<Loop*> getLoops(LoopInfo &LI) {
+    
+    SetVector<Loop*> Loops;
+
+    for(auto &L: LI) {
+        for(auto &SL : L->getSubLoops()) {
+            Loops.insert(SL);
+        }
+        Loops.insert(L);
+    }
+
+    return Loops;
+}
+
+static string getBaseName(string Path) {
+    auto Idx = Path.find_last_of('/');
+    return Idx == string::npos ? Path : Path.substr(Idx+1);
+}
+
+static string getLXName(string File, size_t Line) {
+    return string("__lx_") + File + string("_") + to_string(Line);
 }
 
 bool TargetLoopExtractor::runOnModule(Module &M) {
@@ -116,18 +140,18 @@ bool TargetLoopExtractor::runOnModule(Module &M) {
         auto &LI = getAnalysis<LoopInfoWrapperPass>(F).getLoopInfo();          
         auto &DT = getAnalysis<DominatorTreeWrapperPass>(F).getDomTree();
         
-        for(auto &L : LI) {
+        for(auto &L : getLoops(LI)) {
             auto Loc = L->getStartLoc();
-            auto Filename = Loc->getFilename().str();
+            auto Filename = getBaseName(Loc->getFilename().str());
             auto Line = Loc.getLine();
 
             if(LLVMLXDumpAllLoopLocations) {
-                LoopLocationDumpFile << Loc->getFilename().str() << ":" << Loc.getLine() << "\n";
+                LoopLocationDumpFile << Filename << ":" << Line << "\n";
             }
 
             if(Locations.count({Filename, Line})) {
                 errs() << "[llvm-lx] Found loop at " << Filename << ":" << Line << "\n";
-                if(!extractLoop(L, LI, DT, Filename+to_string(Line))) {
+                if(!extractLoop(L, LI, DT, getLXName(Filename, Line))) {
                     errs() << "[llvm-lx] Unable to extract loop at " << Filename << ":" << Line << "\n";
                 }
                 Locations.erase({Filename, Line});
