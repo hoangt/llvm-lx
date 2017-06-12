@@ -3,6 +3,16 @@ LLVM Targeted Loop Extractor
 
 [![Build Status](https://travis-ci.org/sfu-arch/llvm-lx.svg?branch=master)](https://travis-ci.org/sfu-arch/llvm-lx)
 
+## Build
+
+0. Download pre built binaries for LLVM 4.0 ([link](http://releases.llvm.org/download.html)). Unpack to a suitable location.
+1. `git clone https://github.com/sfu-arch/llvm-lx.git && cd llvm-lx`
+2. `mkdir build && cd build`
+3. `cmake -DLLVM_DIR=<UNTAR>/lib/cmake -DCMAKE_BUILD_TYPE=Release .. && make -j 8`
+4. `sudo make install`    
+
+See `.travis.yml` file for details.
+
 ## Usage
 
 1. Compile the target workload into LLVM 4.0 bitcode with no optimizations and debug symbols embedded.   
