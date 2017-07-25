@@ -6,8 +6,27 @@
 #include "llvm/Analysis/TargetLibraryInfo.h"
 #include "llvm/Analysis/TypeBasedAliasAnalysis.h"
 #include "llvm/AsmParser/Parser.h"
-//#include "llvm/Bitcode/ReaderWriter.h"
+
+#define LLVM_VERSION_GE(major, minor) \
+            (LLVM_VERSION_MAJOR > (major) ||  \
+                           LLVM_VERSION_MAJOR == (major) && LLVM_VERSION_MINOR >= (minor))
+#define LLVM_VERSION_EQ(major, minor) \
+            (LLVM_VERSION_MAJOR == (major) && LLVM_VERSION_MINOR == (minor))
+#define LLVM_VERSION_LE(major, minor) \
+            (LLVM_VERSION_MAJOR < (major) ||  \
+                           LLVM_VERSION_MAJOR == (major) && LLVM_VERSION_MINOR <= (minor))
+#if LLVM_VERSION_GE(3, 7)
+#include "llvm/IR/LegacyPassManager.h"
+#else
+#include "llvm/PassManager.h"
+#endif
+#if LLVM_VERSION_GE(4, 0)
+#include "llvm/Bitcode/BitcodeReader.h"
 #include "llvm/Bitcode/BitcodeWriter.h"
+#else
+#include "llvm/Bitcode/ReaderWriter.h"
+#endif
+
 #include "llvm/CodeGen/LinkAllAsmWriterComponents.h"
 #include "llvm/CodeGen/LinkAllCodegenComponents.h"
 #include "llvm/IR/DataLayout.h"
